@@ -1,0 +1,141 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Bubble Crusher</title>
+    <style type="text/css">
+        HTML, BODY {
+            padding: 0;
+            margin: 0;
+        }
+
+        #viewport {
+            position: relative;
+            overflow: hidden;        
+            display: block;    
+        }
+
+    </style>
+
+    <script type="application/javascript">
+
+        const gameState = {
+            running: true,
+            score: 0,
+            bubbles: []
+        }
+
+        function createBubble(w) {
+            const top = document.getElementById("viewport").height;
+            return {
+                size: 10 * (Math.floor(Math.random() * 5) + 1),
+                color: "#"+((1<<24)*Math.random()|0).toString(16),
+                x: Math.random() * w,
+                y: top,
+                velocity: 0.1 * (Math.floor(Math.random() * 5) + 1),
+            }
+        }
+
+
+
+        function togglePause(){
+            gameState.running =  !gameState.running
+        }
+
+
+        //Pause wird über die Esc-Taste ausgeführt
+        addEventListener("keydown", function(event) {
+              if (event.keyCode == 27){
+                togglePause();                
+              }
+        });
+
+        function init() {
+            const viewport = document.getElementById("viewport");            
+            viewport.width = window.innerWidth;
+            viewport.height = window.innerHeight;
+
+            viewport.addEventListener("mousedown", (event) => {
+                const bubblesCopy = gameState.bubbles.slice();
+
+                for(let bubble of bubblesCopy) {
+                    const dist = Math.sqrt(Math.pow(bubble.x - event.x, 2) + Math.pow(bubble.y - event.y, 2))
+                    if(dist <= bubble.size) {
+                        gameState.bubbles.splice(gameState.bubbles.indexOf(bubble),1);
+                        gameState.score++;
+
+
+                    }
+                }
+
+            })
+             window.requestAnimationFrame(draw);
+        }
+
+        let bubbleCountdown = 0;
+        let lastTimestamp = 0.0;
+
+
+        function draw(timestamp) {
+          if(gameState.running){
+
+            const viewport = document.getElementById("viewport");
+            const ctx = viewport.getContext("2d");
+
+            const delta = timestamp - lastTimestamp;
+            lastTimestamp = timestamp;
+
+            const fps = Math.round(1000.0 / delta);
+
+            if(bubbleCountdown <= 0){
+                gameState.bubbles.push(createBubble(viewport.width))
+                bubbleCountdown = (Math.floor(Math.random() * 1000) + 300);
+            } else {
+                bubbleCountdown -= delta;
+            }
+
+
+            ctx.clearRect(0, 0, viewport.width, viewport.height);
+
+            const bubblesCopy = gameState.bubbles.slice();
+
+            gameState.bubbles = []
+
+            for(let bubble of bubblesCopy) {
+                // Draw
+                ctx.save();
+                ctx.fillStyle = bubble.color;
+                ctx.beginPath();
+                ctx.arc(bubble.x, bubble.y, bubble.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+
+                // Update
+                bubble.y -= bubble.velocity * delta;
+
+                if(bubble.y > 0.0 - bubble.size) {
+                    gameState.bubbles.push(bubble)
+                }
+            }
+            ctx.fillText("Blasen fangen (ESC zum Pausieren)", 10,20);      
+            ctx.fillText(fps,10,40);
+            ctx.fillText("Score: " + gameState.score,10,60);            
+          } else {
+            lastTimestamp = timestamp;
+          }
+          window.requestAnimationFrame(draw);
+
+        }
+
+        document.addEventListener("DOMContentLoaded", init);
+    </script>
+
+</head>
+<body>
+
+<canvas id="viewport"></canvas>
+
+
+</body>
+</html>
