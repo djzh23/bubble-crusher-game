@@ -2,6 +2,9 @@
 
 Ein einfaches, aber unterhaltsames Browsergame, das mit reinem JavaScript (Vanilla JS) und der HTML5 Canvas API implementiert wurde. Das Ziel ist es, so viele aufsteigende Blasen wie möglich zu zerstören, bevor sie den Bildschirmrand verlassen.
 
+## 🚀 Live Demo 
+![GIF showing the game live](bubble-crusher.gif)
+
 ## 🎮 So spielst du
 
 1. **Klicke** auf die farbigen Blasen, um sie zu zerstören und einen Punkt zu erhalten.
